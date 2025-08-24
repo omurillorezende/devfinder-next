@@ -1,50 +1,54 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { UserCard } from "@/components/user-card";
 import { TopReposChart } from "@/components/top-repos-chart";
+import { ShareButtons } from "@/components/share-buttons";
 import type { GitHubUser, TopRepo } from "@/types/github";
 
-type Props = { params: { username: string } };
+type RouteParams = { username: string };
 
 async function getUser(username: string): Promise<GitHubUser | null> {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL ?? ""}/api/github/user?u=${username}`, {
-    // garante que roda no server e pode revalidar
-    cache: "no-store",
-  });
+  const base = process.env.NEXT_PUBLIC_BASE_URL ?? "";
+  const res = await fetch(`${base}/api/github/user?u=${username}`, { cache: "no-store" });
   if (!res.ok) return null;
   return res.json();
 }
 
 async function getTopRepos(username: string): Promise<TopRepo[] | null> {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL ?? ""}/api/github/repos?u=${username}`, {
-    cache: "no-store",
-  });
+  const base = process.env.NEXT_PUBLIC_BASE_URL ?? "";
+  const res = await fetch(`${base}/api/github/repos?u=${username}`, { cache: "no-store" });
   if (!res.ok) return null;
   return res.json();
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const u = params.username;
+// Next 15: params pode ser Promise<>
+export async function generateMetadata(
+  { params }: { params: Promise<RouteParams> }
+): Promise<Metadata> {
+  const { username } = await params;
   return {
-    title: `DevFinder — ${u}`,
-    description: `Perfil GitHub e top repositórios de ${u}`,
+    title: `DevFinder — ${username}`,
+    description: `Perfil GitHub e top repositórios de ${username}`,
     openGraph: {
-      title: `DevFinder — ${u}`,
-      description: `Perfil GitHub e top repositórios de ${u}`,
-      url: `/u/${u}`,
+      title: `DevFinder — ${username}`,
+      description: `Perfil GitHub e top repositórios de ${username}`,
+      url: `/u/${username}`,
       siteName: "DevFinder",
       type: "website",
     },
     twitter: {
       card: "summary",
-      title: `DevFinder — ${u}`,
-      description: `Perfil GitHub e top repositórios de ${u}`,
+      title: `DevFinder — ${username}`,
+      description: `Perfil GitHub e top repositórios de ${username}`,
     },
   };
 }
 
-export default async function Page({ params }: Props) {
-  const username = params.username;
+export default async function Page(
+  { params }: { params: Promise<RouteParams> }
+) {
+  const { username } = await params;
+
   const [user, repos] = await Promise.all([getUser(username), getTopRepos(username)]);
   if (!user) notFound();
 
@@ -63,6 +67,3 @@ export default async function Page({ params }: Props) {
     </main>
   );
 }
-
-import { ShareButtons } from "@/components/share-buttons";
-

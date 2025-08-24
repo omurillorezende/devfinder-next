@@ -4,6 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 import { SearchForm } from "@/components/search-form";
 import { UserCard } from "@/components/user-card";
 import { TopReposChart } from "@/components/top-repos-chart";
+import { Skeleton } from "@/components/skeleton";
+import { EmptyState, ErrorState } from "@/components/ui-states";
 
 export default function Home() {
   const [username, setUsername] = useState<string | null>(null);
@@ -16,7 +18,7 @@ export default function Home() {
       return res.json();
     },
     enabled: !!username,
-    staleTime: 1000 * 60, // 1 min
+    staleTime: 60_000,
   });
 
   const reposQuery = useQuery({
@@ -27,7 +29,7 @@ export default function Home() {
       return res.json();
     },
     enabled: !!username,
-    staleTime: 1000 * 60,
+    staleTime: 60_000,
   });
 
   return (
@@ -37,12 +39,24 @@ export default function Home() {
 
         <SearchForm onSearch={(u) => setUsername(u)} />
 
-        {userQuery.isLoading && <p>Carregando usuário...</p>}
-        {userQuery.isError && <p className="text-red-600">Erro: {(userQuery.error as Error).message}</p>}
+        {!username && <EmptyState text="Busque um usuário para começar." />}
+
+        {userQuery.isLoading && (
+          <div role="status" aria-busy="true" className="space-y-3">
+            <Skeleton className="h-6 w-40" />
+            <Skeleton className="h-24 w-full" />
+          </div>
+        )}
+        {userQuery.isError && <ErrorState text={(userQuery.error as Error).message} />}
         {userQuery.data && <UserCard data={userQuery.data} />}
 
-        {reposQuery.isLoading && username && <p>Buscando repositórios...</p>}
-        {reposQuery.isError && username && <p className="text-red-600">Erro ao buscar repositórios.</p>}
+        {reposQuery.isLoading && username && (
+          <div role="status" aria-busy="true" className="space-y-3">
+            <Skeleton className="h-6 w-56" />
+            <Skeleton className="h-64 w-full" />
+          </div>
+        )}
+        {reposQuery.isError && username && <ErrorState text="Erro ao carregar repositórios." />}
         {reposQuery.data && <TopReposChart data={reposQuery.data} />}
       </div>
     </main>

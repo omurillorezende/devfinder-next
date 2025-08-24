@@ -1,11 +1,13 @@
-export function UserCard({ data }: { data: any }) {
-  if (!data) return null;
+import Image from "next/image";
+import type { GitHubUser } from "@/types/github";
+
+export function UserCard({ data }: { data: GitHubUser }) {
   return (
     <div className="border rounded-xl p-4 space-y-2">
       <div className="flex items-center gap-4">
-        <img src={data.avatar_url} alt={data.login} className="w-16 h-16 rounded-full" />
+        <Image src={data.avatar_url} alt={data.login} width={64} height={64} className="rounded-full" />
         <div>
-          <h2 className="text-xl font-semibold">{data.name || data.login}</h2>
+          <h2 className="text-xl font-semibold">{data.name ?? data.login}</h2>
           <p className="text-sm opacity-80">@{data.login}</p>
         </div>
       </div>
@@ -15,12 +17,7 @@ export function UserCard({ data }: { data: any }) {
         <span>Followers: <strong>{data.followers}</strong></span>
         <span>Following: <strong>{data.following}</strong></span>
       </div>
-      {data.html_url && (
-        <a className="text-sm underline" href={data.html_url} target="_blank">
-          Ver no GitHub
-        </a>
-      )}
+      <a className="text-sm underline" href={data.html_url} target="_blank">Ver no GitHub</a>
     </div>
   );
 }
-

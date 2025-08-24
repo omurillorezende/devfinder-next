@@ -1,5 +1,18 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+# devfinder-next
+
+[![CI](https://github.com/omurillorezende/devfinder-next/actions/workflows/ci.yml/badge.svg)](https://github.com/omurillorezende/devfinder-next/actions/workflows/ci.yml)
+[![Deploy](https://img.shields.io/badge/Deploy-Vercel-blue?logo=vercel)](https://devfinder-next-one.vercel.app/)
+
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+
+## Getting Started
+
+...
+
+
+
 ## Getting Started
 
 First, run the development server:

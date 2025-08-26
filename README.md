@@ -1,7 +1,7 @@
 # 🔎 DevFinder
 
 ![build](https://img.shields.io/github/actions/workflow/status/omurillorezende/devfinder-next/ci.yml?branch=main)
-![license](https://img.shields.io/github/license/omurillorezende/devfinder-next)
+![GitHub license](https://img.shields.io/github/license/omurillorezende/devfinder-next?color=blue)
 
 Aplicação para **buscar perfis de desenvolvedores no GitHub** e visualizar seus **repositórios mais populares**.  
 Feito com **Next.js 15, React, TypeScript e Tailwind CSS**, com deploy serverless na **Vercel**.

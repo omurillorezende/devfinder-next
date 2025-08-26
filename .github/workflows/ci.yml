@@ -13,18 +13,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # 1) Node primeiro
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: pnpm  # usa pnpm-lock.yaml para cache
+          cache: pnpm
 
-      # 2) Habilita corepack (pnpm gerenciado pelo Node 20+)
       - name: Enable corepack
         run: corepack enable
 
-      # 3) Garante versão do pnpm (opcional, mas bom)
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
@@ -33,12 +30,14 @@ jobs:
       - name: Install deps
         run: pnpm install --frozen-lockfile
 
-      # Lint/Types "soft" para o badge ficar verde mesmo sem regras finais
+      # checagem de tipos (não quebra se não tiver script ainda)
       - name: Type check
         run: pnpm -s type-check || echo "no type-check script"
 
+      # lint (não quebra se não tiver script ainda)
       - name: Lint
         run: pnpm -s lint || echo "lint skipped"
 
+      # build de produção
       - name: Build
         run: pnpm -s build

@@ -2,42 +2,42 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ "main" ]
   pull_request:
+    branches: [ "main" ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      # 1. Baixa o código do repositório
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      # 2. Configura o Node.js (você pode trocar a versão se precisar)
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: pnpm
+          cache: 'pnpm'
 
-      - name: Enable corepack
-        run: corepack enable
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+      # 3. Instala PNPM
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v3
         with:
           version: 9
+          run_install: false
 
-      - name: Install deps
+      # 4. Instala dependências
+      - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # checagem de tipos (não quebra se não tiver script ainda)
-      - name: Type check
-        run: pnpm -s type-check || echo "no type-check script"
+      # 5. Build da aplicação
+      - name: Build project
+        run: pnpm build
 
-      # lint (não quebra se não tiver script ainda)
-      - name: Lint
-        run: pnpm -s lint || echo "lint skipped"
-
-      # build de produção
-      - name: Build
-        run: pnpm -s build
+      # 6. (Opcional) Rodar testes
+      # Se você tiver testes configurados, descomente:
+      # - name: Run tests
+      #   run: pnpm test

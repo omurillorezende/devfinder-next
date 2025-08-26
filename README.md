@@ -32,14 +32,6 @@ Feito com **Next.js 15, React, TypeScript e Tailwind CSS**, com deploy serverles
 
 ---
 
-## 🖼 Preview
-
-![Preview do DevFinder](./.github/preview.png)
-
-*(adicione aqui um print ou gif da aplicação rodando)*
-
----
-
 ## 💻 Como rodar localmente
 
 ```bash

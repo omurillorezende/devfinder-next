@@ -1,10 +1,27 @@
 {
+  "name": "devfinder-next",
+  "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "start": "next start",
     "lint": "eslint .",
     "type-check": "tsc -p tsconfig.json --noEmit",
-    "test:e2e": "playwright test"
+    "postinstall": "prisma generate",
+    "migrate:deploy": "prisma migrate deploy",
+    "studio": "prisma studio"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@prisma/client",
+      "@prisma/engines",
+      "prisma",
+      "unrs-resolver"
+    ],
+    "ignoredBuiltDependencies": [
+      "@tailwindcss/oxide",
+      "sharp"
+    ]
   },
   "dependencies": {
     "@prisma/client": "^6.14.0",

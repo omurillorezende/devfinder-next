@@ -1,12 +1,11 @@
 {
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
-    "e2e": "playwright test",
-    "e2e:ui": "playwright test --ui"
-  },
+  "dev": "next dev",
+  "build": "next build",
+  "lint": "eslint .",
+  "type-check": "tsc -p tsconfig.json --noEmit",
+  "test:e2e": "playwright test"
+},
   "dependencies": {
     "@tanstack/react-query": "^5.85.5",
     "next": "^15.5.0",

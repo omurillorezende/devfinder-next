@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["**"] # roda em todas as branches
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   build:
@@ -15,7 +15,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Configura o Node.js (você pode trocar a versão se precisar)
+      # 2. Configura Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -36,8 +36,3 @@ jobs:
       # 5. Build da aplicação
       - name: Build project
         run: pnpm build
-
-      # 6. (Opcional) Rodar testes
-      # Se você tiver testes configurados, descomente:
-      # - name: Run tests
-      #   run: pnpm test

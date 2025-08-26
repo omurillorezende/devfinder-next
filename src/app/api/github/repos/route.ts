@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -14,10 +14,7 @@ export async function GET(req: Request) {
   };
   if (process.env.GITHUB_TOKEN) headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
 
-  const gh = await fetch(
-    `https://api.github.com/users/${u}/repos?per_page=100&sort=updated`,
-    { headers }
-  );
+  const gh = await fetch(`https://api.github.com/users/${u}/repos?per_page=100&sort=updated`, { headers });
   const repos = await gh.json();
 
   if (!Array.isArray(repos)) return NextResponse.json(repos, { status: gh.status });

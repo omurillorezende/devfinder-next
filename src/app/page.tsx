@@ -1,75 +1,43 @@
-"use client";
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { SearchForm } from "@/components/search-form";
-import { UserCard } from "@/components/user-card";
-import { TopReposChart } from "@/components/top-repos-chart";
+import { prisma } from "@/lib/prisma";
+import { ProjectCard } from "@/components/ProjectCard";
+import DevFinderClient from "@/components/DevFinderClient";
 
-type GitHubUser = {
-  login: string;
-  name: string | null;
-  avatar_url: string;
-  bio: string | null;
-  public_repos: number;
-  followers: number;
-  following: number;
-  html_url: string;
-};
+export default async function Home() {
+  const [trending, alltime] = await Promise.all([
+    prisma.project.findMany({ orderBy: { scoreTrending: "desc" }, take: 10 }),
+    prisma.project.findMany({ orderBy: { scoreAllTime: "desc" }, take: 10 }),
+  ]);
 
-type TopRepo = { name: string; stars: number; url: string; language: string | null };
-
-async function fetchUser(username: string): Promise<GitHubUser | null> {
-  if (!username) return null;
-  const r = await fetch(`https://api.github.com/users/${username}`);
-  if (!r.ok) throw new Error((await r.json()).message || `Erro ${r.status}`);
-  return r.json();
-}
-
-async function fetchTopRepos(username: string): Promise<TopRepo[] | null> {
-  if (!username) return null;
-  const r = await fetch(`https://api.github.com/users/${username}/repos?per_page=100&sort=updated`);
-  if (!r.ok) throw new Error((await r.json()).message || `Erro ${r.status}`);
-  const repos = (await r.json()) as any[];
-  return repos
-    .sort((a, b) => b.stargazers_count - a.stargazers_count)
-    .slice(0, 5)
-    .map((r) => ({ name: r.name, stars: r.stargazers_count, url: r.html_url, language: r.language ?? null }));
-}
-
-export default function Home() {
-  const [username, setUsername] = useState("");
-
-  const { data: user, error: userErr, isFetching: loadingUser } = useQuery({
-    queryKey: ["user", username],
-    queryFn: () => fetchUser(username),
-    enabled: !!username,
-    retry: false,
-  });
-
-  const { data: repos, error: reposErr, isFetching: loadingRepos } = useQuery({
-    queryKey: ["repos", username],
-    queryFn: () => fetchTopRepos(username),
-    enabled: !!username,
-    retry: false,
-  });
+  const norm = (p: any) => ({ ...p, topics: (p.topics as string[] | null) ?? [] });
 
   return (
-    <main className="min-h-screen grid place-items-center p-8">
-      <div className="max-w-3xl w-full space-y-6">
-        <h1 className="text-3xl font-bold">DevFinder</h1>
+    <main className="max-w-5xl mx-auto p-4 space-y-10">
+      {/* 👉 DevFinder no topo */}
+      <section>
+        <DevFinderClient />
+      </section>
 
-        <SearchForm onSearch={setUsername} />
+      {/* Rankings abaixo */}
+      <section>
+        <h2 className="text-xl font-semibold mb-3">🔥 Em alta</h2>
+        <div className="grid gap-3 md:grid-cols-2">
+          {trending.map((p) => (
+            <ProjectCard key={p.id} p={norm(p)} />
+          ))}
+        </div>
+      </section>
 
-        {userErr && <p className="text-red-500 text-sm">{(userErr as Error).message || "Usuário não encontrado"}</p>}
-        {reposErr && <p className="text-red-500 text-sm">{(reposErr as Error).message || "Erro ao carregar repositórios"}</p>}
-
-        {loadingUser && <p className="opacity-70 text-sm">Carregando usuário…</p>}
-        {user && <UserCard data={user} />}
-
-        {loadingRepos && <p className="opacity-70 text-sm">Carregando repositórios…</p>}
-        {repos?.length ? <TopReposChart data={repos} /> : username && !loadingRepos && <p className="text-sm opacity-70">Sem repositórios populares.</p>}
-      </div>
+      <section>
+        <h2 className="text-xl font-semibold mb-3">🏆 Todos os tempos</h2>
+        <div className="grid gap-3 md:grid-cols-2">
+          {alltime.map((p) => (
+            <ProjectCard key={p.id} p={norm(p)} />
+          ))}
+        </div>
+      </section>
     </main>
   );
 }

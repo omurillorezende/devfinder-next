@@ -1,35 +1,57 @@
 "use client";
+
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { SearchForm } from "@/components/search-form";
 import { UserCard } from "@/components/user-card";
 import { TopReposChart } from "@/components/top-repos-chart";
-import { Skeleton } from "@/components/skeleton";
-import { EmptyState, ErrorState } from "@/components/ui-states";
+
+type GitHubUser = {
+  login: string;
+  name: string | null;
+  avatar_url: string;
+  bio: string | null;
+  public_repos: number;
+  followers: number;
+  following: number;
+  html_url: string;
+};
+
+type TopRepo = { name: string; stars: number; url: string; language: string | null };
+
+async function fetchUser(username: string): Promise<GitHubUser | null> {
+  if (!username) return null;
+  const r = await fetch(`https://api.github.com/users/${username}`);
+  if (!r.ok) throw new Error((await r.json()).message || `Erro ${r.status}`);
+  return r.json();
+}
+
+async function fetchTopRepos(username: string): Promise<TopRepo[] | null> {
+  if (!username) return null;
+  const r = await fetch(`https://api.github.com/users/${username}/repos?per_page=100&sort=updated`);
+  if (!r.ok) throw new Error((await r.json()).message || `Erro ${r.status}`);
+  const repos = (await r.json()) as any[];
+  return repos
+    .sort((a, b) => b.stargazers_count - a.stargazers_count)
+    .slice(0, 5)
+    .map((r) => ({ name: r.name, stars: r.stargazers_count, url: r.html_url, language: r.language ?? null }));
+}
 
 export default function Home() {
-  const [username, setUsername] = useState<string | null>(null);
+  const [username, setUsername] = useState("");
 
-  const userQuery = useQuery({
+  const { data: user, error: userErr, isFetching: loadingUser } = useQuery({
     queryKey: ["user", username],
-    queryFn: async () => {
-      const res = await fetch(`/api/github/user?u=${username}`);
-      if (!res.ok) throw new Error("Usuário não encontrado");
-      return res.json();
-    },
+    queryFn: () => fetchUser(username),
     enabled: !!username,
-    staleTime: 60_000,
+    retry: false,
   });
 
-  const reposQuery = useQuery({
+  const { data: repos, error: reposErr, isFetching: loadingRepos } = useQuery({
     queryKey: ["repos", username],
-    queryFn: async () => {
-      const res = await fetch(`/api/github/repos?u=${username}`);
-      if (!res.ok) throw new Error("Falha ao buscar repositórios");
-      return res.json();
-    },
+    queryFn: () => fetchTopRepos(username),
     enabled: !!username,
-    staleTime: 60_000,
+    retry: false,
   });
 
   return (
@@ -37,27 +59,16 @@ export default function Home() {
       <div className="max-w-3xl w-full space-y-6">
         <h1 className="text-3xl font-bold">DevFinder</h1>
 
-        <SearchForm onSearch={(u) => setUsername(u)} />
+        <SearchForm onSearch={setUsername} />
 
-        {!username && <EmptyState text="Busque um usuário para começar." />}
+        {userErr && <p className="text-red-500 text-sm">{(userErr as Error).message || "Usuário não encontrado"}</p>}
+        {reposErr && <p className="text-red-500 text-sm">{(reposErr as Error).message || "Erro ao carregar repositórios"}</p>}
 
-        {userQuery.isLoading && (
-          <div role="status" aria-busy="true" className="space-y-3">
-            <Skeleton className="h-6 w-40" />
-            <Skeleton className="h-24 w-full" />
-          </div>
-        )}
-        {userQuery.isError && <ErrorState text={(userQuery.error as Error).message} />}
-        {userQuery.data && <UserCard data={userQuery.data} />}
+        {loadingUser && <p className="opacity-70 text-sm">Carregando usuário…</p>}
+        {user && <UserCard data={user} />}
 
-        {reposQuery.isLoading && username && (
-          <div role="status" aria-busy="true" className="space-y-3">
-            <Skeleton className="h-6 w-56" />
-            <Skeleton className="h-64 w-full" />
-          </div>
-        )}
-        {reposQuery.isError && username && <ErrorState text="Erro ao carregar repositórios." />}
-        {reposQuery.data && <TopReposChart data={reposQuery.data} />}
+        {loadingRepos && <p className="opacity-70 text-sm">Carregando repositórios…</p>}
+        {repos?.length ? <TopReposChart data={repos} /> : username && !loadingRepos && <p className="text-sm opacity-70">Sem repositórios populares.</p>}
       </div>
     </main>
   );

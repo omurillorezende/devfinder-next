@@ -1,0 +1,7 @@
+{
+  "approvedBuilds": {
+    "@prisma/client": true,
+    "prisma": true,
+    "@prisma/engines": true
+  }
+}

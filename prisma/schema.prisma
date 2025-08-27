@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider = "postgresql"        // <= trocado de sqlite para postgresql
+  url      = env("DATABASE_URL") // use a URL do Neon aqui (via env)
 }
 
 model Project {
@@ -15,7 +15,7 @@ model Project {
   owner          String
   description    String?
   language       String?
-  topics         Json              // <= aqui (array JSON de strings)
+  topics         Json                // array JSON de strings (ok no Postgres)
   stars          Int
   forks          Int
   watchers       Int
@@ -31,4 +31,9 @@ model Project {
 
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+
+  @@index([scoreTrending])
+  @@index([scoreAllTime])
+  @@index([language])
+  @@index([stars])
 }

@@ -94,22 +94,24 @@ const ProjectCard = ({ p }: { p: Project }) => {
         </div>
       </header>
 
-      {/* Topics */}
+      {/* Topics — rolável no mobile */}
       {(topics.length > 0 || extra > 0) && (
-        <div className="mt-3 flex flex-wrap gap-1.5">
-          {topics.map((t) => (
-            <span
-              key={t}
-              className="text-[11px] px-2 py-1 rounded-md border border-neutral-700 bg-neutral-900/70"
-            >
-              {t}
-            </span>
-          ))}
-          {extra > 0 && (
-            <span className="text-[11px] px-2 py-1 rounded-md border border-neutral-700 bg-neutral-900/70">
-              +{extra}
-            </span>
-          )}
+        <div className="mt-3 -mx-1 px-1 overflow-x-auto no-scrollbar">
+          <div className="flex gap-1.5 whitespace-nowrap">
+            {topics.map((t) => (
+              <span
+                key={t}
+                className="text-[11px] px-2 py-1 rounded-md border border-neutral-700 bg-neutral-900/70"
+              >
+                {t}
+              </span>
+            ))}
+            {extra > 0 && (
+              <span className="text-[11px] px-2 py-1 rounded-md border border-neutral-700 bg-neutral-900/70">
+                +{extra}
+              </span>
+            )}
+          </div>
         </div>
       )}
 
@@ -143,6 +145,7 @@ const ProjectCard = ({ p }: { p: Project }) => {
         </div>
       </footer>
 
+      {/* Scores */}
       <div className="mt-2 flex items-center gap-3 text-xs text-neutral-400">
         <span title="Score em alta">🔥 {p.scoreTrending.toFixed(2)}</span>
         <span title="Score todos os tempos">🏆 {p.scoreAllTime.toFixed(2)}</span>
@@ -151,5 +154,5 @@ const ProjectCard = ({ p }: { p: Project }) => {
   );
 };
 
-export { ProjectCard };        // export nomeado
-export default ProjectCard;     // export default
+export { ProjectCard };
+export default ProjectCard;

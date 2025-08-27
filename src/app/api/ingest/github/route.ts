@@ -1,3 +1,4 @@
+export const runtime = "nodejs";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
@@ -9,7 +10,7 @@ const headers: HeadersInit = {
 };
 
 export const dynamic = "force-dynamic";
-export const runtime = "nodejs";
+
 
 const toLang = (lang: any) =>
   typeof lang === "string" && lang.length ? lang.toLowerCase() : null;

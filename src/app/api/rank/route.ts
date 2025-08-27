@@ -1,8 +1,9 @@
+export const runtime = "nodejs";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { scoreAllTime, scoreTrending } from "@/lib/scoring";
 
-export const runtime = "nodejs";
+
 export const dynamic = "force-dynamic";
 
 export async function POST() {
